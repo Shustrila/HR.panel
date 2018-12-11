@@ -6,7 +6,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
   state: {
     login: false,
-    personalAccount: true,
+    personalAccount: false,
+    visiblePassword: false,
     userLogin: {
       name: 'ivan',
       surname: 'ivanov',
@@ -34,10 +35,16 @@ export default new Vuex.Store({
         }
     ]
   },
+  getters: {
+  },
   mutations: {
-
+      visiblePassword (state, payload) {
+          state.visiblePassword = payload
+      }
   },
   actions: {
-
+      visiblePasswordAsync (context, payload) {
+          return context.commit('visiblePassword', payload)
+      }
   }
 })
