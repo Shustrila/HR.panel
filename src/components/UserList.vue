@@ -1,14 +1,14 @@
 <template>
     <div class="user-list user-list--hidden js-user-list">
-        <div class="user-list__label">Пользователей онлайн</div>
+        <div class="user-list__label">Пользователей онлайн {{ numberOfUsers }}</div>
         <ul class="user-list__list" v-if="login">
-            <li class="user-list__item" v-for="user in usersList" :key="user.id">
+            <li class="user-list__item" v-for="user in usersList" :key="user">
                 <div class="user-list__img">
 
                 </div>
                 <div class="user-list__wpapper">
                     <div class="user-list__name">
-                        {{ user.fullname }}
+                        {{ user.name }}
                     </div>
                     <div class="user-list__email">
                         {{ user.email }}
@@ -16,20 +16,35 @@
                 </div>
             </li>
         </ul>
-        <div class="" v-if="!login">
-            Что бы видеть активных пользовотелей нужно
+        <div class="user-list__info" v-if="!login">
+            Что бы видеть активных<br>
+            пользовотелей нужно<br>
             <router-link to="/registration"> зарегистрироваться </router-link>
+        </div>
+        <div class="user-list__info" v-if="login && usersList.length  === 0">
+            Нет пользователей онлайн
         </div>
     </div>
 </template>
-
+s
 <script>
     export default {
         name: "UserList",
         data () {
             return {
-                login:  this.$store.state.login,
+                login:  this.$store.state.userLogin,
                 usersList: this.$store.state.usersList
+            }
+        },
+        computed: {
+            numberOfUsers(){
+                let usersList = this.usersList;
+
+                if( this.usersList !== null ){
+                    return usersList.length
+                }else{
+                    return 0
+                }
             }
         }
     }
@@ -83,6 +98,9 @@
         &__wpapper{
             flex-grow: 1;
             text-align: left;
+            color: #ffffff;
+        }
+        &__info{
             color: #ffffff;
         }
     }

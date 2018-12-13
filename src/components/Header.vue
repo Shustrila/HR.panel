@@ -1,6 +1,6 @@
 <template>
     <header class="header">
-        <div class="header__overlay" v-if="personalAccount"></div>
+        <div class="header__overlay" v-if="$store.state.personalAccount"></div>
         <div class="header__panel">
             <ul class="header__menu">
                 <li class="header__menu-item">
@@ -17,17 +17,17 @@
         </div>
         <div class="header__auth"  v-if="!login">
             <router-link class="header__auth-login header__auth-link" to="/login">
-                login
+                Вход
             </router-link>
             <span class="header__auth-line">|</span>
             <router-link class="header__auth-reg header__auth-link" to="/registration">
-                registration
+                Регистрация
             </router-link>
         </div>
-        <div class="header__user" v-if="login">
+        <div class="header__user" v-if="login"  @click.prevent="personalAccountActive()">
             <div class="header__user-img"></div>
-            <a class="header__user-name" @click.prevent="personalAccountActive()">
-                ivan ivanov
+            <a class="header__user-name">
+                {{ `${login.name} ${login.surname}` }}
             </a>
         </div>
         <div class="header__user-list" @click="activeMenu()">
@@ -43,8 +43,7 @@
         name: "Header",
         data() {
             return {
-                login: this.$store.state.login,
-                personalAccount: this.$store.state.personalAccount
+                login: this.$store.state.userLogin
             }
         },
         methods: {
@@ -52,7 +51,7 @@
                 $('.js-user-list').toggleClass('user-list--hidden')
             },
             personalAccountActive(){
-                return
+                this.$store.commit("personalAccount", true)
             }
         }
     }
@@ -149,6 +148,7 @@
             display: flex;
             flex-wrap: wrap;
             align-items: center;
+            cursor: pointer;
 
             &-img{
                 width: 30px;

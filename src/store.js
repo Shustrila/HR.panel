@@ -1,50 +1,40 @@
-import Vue from 'vue'
-import Vuex from 'vuex'
+import Vue from 'vue';
+import Vuex from 'vuex';
 
 Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-    login: false,
     personalAccount: false,
-    visiblePassword: false,
-    userLogin: {
-      name: 'ivan',
-      surname: 'ivanov',
-      fullname: 'ivan ivanov',
-        email: 'ivan.ivanov@gmail.com'
-    },
-    usersList: [
-        {
-          id: 1,
-          fullname: 'Denis Utkin',
-          email: 'denis.utkin@mail.com',
-          photo: ''
-        },
-        {
-            id: 2,
-            fullname: 'Lika Galchinskaya',
-            email: 'lika.galchinskaya@mail.com',
-            photo: ''
-        },
-        {
-            id: 3,
-            fullname: 'Max Chernenkov',
-            email: 'max.chernenkov@mail.com',
-            photo: ''
-        }
-    ]
+    userLogin: null,
+    usersList: null
   },
   getters: {
   },
   mutations: {
-      visiblePassword (state, payload) {
-          state.visiblePassword = payload
+      loginUser (state, payload) {
+           return state.userLogin = payload;
+      },
+      usersList (state, payload) {
+          let usersOnline = payload.filter( user => {
+              return user.email !== state.userLogin.email
+          });
+
+          return state.usersList = (usersOnline !== undefined)? usersOnline: false;
+      },
+      personalAccount (state, payload) {
+          return state.personalAccount = payload;
       }
   },
   actions: {
-      visiblePasswordAsync (context, payload) {
-          return context.commit('visiblePassword', payload)
+      login (context, payload) {
+          if(payload.userLogin !== undefined){
+              console.log(payload);
+              context.commit('loginUser', );
+              context.commit('usersList', );
+          }else{
+              console.log('узер залогинелся');
+          }
       }
   }
 })

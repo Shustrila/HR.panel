@@ -42,12 +42,18 @@
             loginForm () {
                 let formLogin = this.$refs['login-form'];
                 let formElems = formLogin.elements;
-                let valFields = {
-                  email: formElems.email.value,
-                  password: formElems.password.value
-                };
 
-                console.log(valFields);
+                $.ajax({
+                    url: "/api/login",
+                    methods: "POST",
+                    body:{
+                        email: formElems.email.value,
+                        password: formElems.password.value
+                    },
+                    success (data) {
+                        console.log(data)
+                    }
+                })
             }
         }
     }

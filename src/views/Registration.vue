@@ -1,6 +1,9 @@
 <template>
     <div class="registration">
         <form class="registration__form" ref="registration-form">
+            <div class="registration__form-title">
+                Форма регистрации
+            </div>
             <div class="registration__wpapper-name">
                 <label class="registration__label-name registration__label">
                     Имя
@@ -51,7 +54,6 @@
 
 <script>
     import $ from 'jquery';
-    import Cookies from 'js-cookie';
 
     export default {
         name: "Registration",
@@ -70,8 +72,7 @@
                 let passVerification   = elemForn.repeatPassword.value === elemForn.password.value;
                 let minVal             = elemForn.password.value.length > 4;
 
-                if(passVerification && minVal)
-                {
+                if(passVerification && minVal) {
                     $.ajax({
                         method: "POST",
                         url: '/api/user',
@@ -86,8 +87,6 @@
                         }
                     });
                 }
-
-
             }
         }
     }
@@ -104,6 +103,14 @@
         width: 100%;
         height: 100%;
         overflow: auto;
+
+        &__form-title{
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ffffff;
+            text-align: center;
+            color: #ffffff;
+        }
 
         &__form{
             width: 400px;
