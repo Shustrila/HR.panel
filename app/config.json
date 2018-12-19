@@ -1,3 +1,8 @@
 {
+  "SQLITE": {
+    "FILE": "database",
+    "DIR": "./",
+    "FULL": "./database"
+  },
   "SECRET_KEY": "A[&HFV!J}&e}Pd(uvd-J#RZ;9ttxU/UZwy=8q215EvKy|b!m"
 }

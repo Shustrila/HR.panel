@@ -4,37 +4,29 @@ import Vuex from 'vuex';
 Vue.use(Vuex);
 
 export default new Vuex.Store({
-  state: {
-    personalAccount: false,
-    userLogin: null,
-    usersList: null
-  },
-  getters: {
-  },
-  mutations: {
-      loginUser (state, payload) {
-           return state.userLogin = payload;
-      },
-      usersList (state, payload) {
-          let usersOnline = payload.filter( user => {
-              return user.email !== state.userLogin.email
-          });
-
-          return state.usersList = (usersOnline !== undefined)? usersOnline: false;
-      },
-      personalAccount (state, payload) {
-          return state.personalAccount = payload;
-      }
-  },
-  actions: {
-      login (context, payload) {
-          if(payload.userLogin !== undefined){
-              console.log(payload);
-              context.commit('loginUser', );
-              context.commit('usersList', );
-          }else{
-              console.log('узер залогинелся');
-          }
-      }
-  }
-})
+    state: {
+        personalAccount: false,
+        workers: [],
+        userLogin: null,
+        usersOnline: null
+    },
+    mutations: {
+        loginUser (state, payload) {
+            state.userLogin = payload;
+        },
+        personalAccount (state, payload) {
+            state.personalAccount = payload;
+        },
+        usersOnline (state, payload) {
+            state.usersOnline = payload;
+        },
+        setWorkers (state, payload) {
+            state.workers = payload;
+        }
+    },
+    actions: {
+        login (context, payload) {
+            context.commit("loginUser", payload)
+        }
+    }
+});

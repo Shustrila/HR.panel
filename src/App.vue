@@ -10,14 +10,15 @@
 </template>
 
 <script>
-import axios from "axios"
+import axios from "axios";
 import Cookies from 'js-cookie';
+
 export default {
     name: "App",
     data () {
         return {
-            userLogin: null,
-            userList: null
+            errored: false,
+            workers: [],
         }
     },
     components: {
@@ -25,21 +26,27 @@ export default {
         UserList: () => import('./components/UserList'),
         PersonalAccount: () => import('./components/PersonalAccount')
     },
-    beforeCreate () {
-        let email    = Cookies.get("_email");
-        let password = Cookies.get("_password");
+    mounted () {
+        let token = Cookies.get("outh_key");
 
-        axios.get(`/api/user/${email}`)
-             .then(response => this.userLogin = response.data);
+        if(token !== undefined || token !== "") {
+            axios.get(`http://localhost:3000/api/user/${token}`, {}, {
+                "Access-Control-Allow-Origin": "*"
+            }).then(response => {
+                    console.log(response.data);
+                    this.$store.dispatch("login", response.data);
+            }).catch(error => {
+                console.log(error);
+            });
 
-        axios.get("/api/users")
-             .then(response => this.userLogin = response.data);
-
-        this.$store.dispatch({
-            type: "login",
-            userLogin: this.userLogin,
-            userList: this.userList
-        });
+            // axios.get(`http://localhost:3000/api/users`, {}, {
+            //     "Access-Control-Allow-Origin": "*"
+            // }).then(response => {
+            //     this.$store.dispatch("usersOnline", response.data);
+            // }).catch(error => {
+            //     console.log(error);
+            // });
+        }
     }
 }
 </script>
@@ -53,6 +60,17 @@ export default {
 
 html, body{
   height: 100%;
+}
+
+@keyframes slideInDown {
+    0%{
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    100%{
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 #app {

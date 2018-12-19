@@ -32,8 +32,8 @@ s
         name: "UserList",
         data () {
             return {
-                login:  this.$store.state.userLogin,
-                usersList: this.$store.state.usersList
+                login: {},
+                usersList: {}
             }
         },
         computed: {

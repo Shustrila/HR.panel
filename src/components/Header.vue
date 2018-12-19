@@ -38,12 +38,15 @@
 
 <script>
     import $ from 'jquery'
+    import axios from "axios";
+    import Cookies from 'js-cookie';
 
     export default {
         name: "Header",
         data() {
             return {
-                login: this.$store.state.userLogin
+                login: this.$store.state.userLogin,
+                workers: this.$store.state.workers
             }
         },
         methods: {

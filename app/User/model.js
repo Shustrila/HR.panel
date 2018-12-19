@@ -5,10 +5,10 @@ module.exports = {
         CREATE TABLE IF NOT EXISTS user (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           online BOOLEAN,
-          name VARCHAR(30),
-          surname VARCHAR(30),
-          email VARCHAR(30) UNIQUE,
-          password VARCHAR(30),
+          name VARCHAR(16),
+          surname VARCHAR(16),
+          email VARCHAR(45) UNIQUE,
+          password VARCHAR(60),
           token VARCHAR(150) UNIQUE
         )
     `,
@@ -21,18 +21,19 @@ module.exports = {
     },
     createRow: function (obj) {
         return `
-          INSERT INTO user (
-                     online,
-                     name, 
-                     surname, 
-                     email, 
-                     password)
-          VALUES (
-               false,
-              '${obj.name}', 
-              '${obj.surname}', 
-              '${obj.email}', 
-              '${obj.password}')
+            INSERT INTO user (
+                online,
+                name, 
+                surname, 
+                email, 
+                password
+            ) VALUES (
+                false,
+                '${obj.name}', 
+                '${obj.surname}', 
+                '${obj.email}', 
+                '${obj.password}'
+            )
         `;
     },
 };

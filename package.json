@@ -3,18 +3,21 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "serve:up": "PORT=9000 nodemon index.js",
-    "serve": "vue-cli-service serve",
+    "serve:up": "PORT=3000 nodemon index.js",
+    "serve": "NODE_ENV=development vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint"
+    "lint": "vue-cli-service lint",
+    "test": "mocha tests/users.js "
   },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.8",
     "@fortawesome/free-solid-svg-icons": "^5.5.0",
     "@fortawesome/vue-fontawesome": "^0.1.3",
+    "axios": "^0.18.0",
     "body-parser": "^1.18.3",
     "connect-sqlite3": "^0.9.11",
     "cookie-parser": "^1.4.3",
+    "cors": "^2.8.5",
     "express": "^4.15.2",
     "express-session": "^1.15.6",
     "jquery": "^3.3.1",
@@ -30,16 +33,20 @@
     "@vue/cli-plugin-babel": "^3.2.0",
     "@vue/cli-plugin-eslint": "^3.2.1",
     "@vue/cli-service": "^3.2.0",
+    "assert": "^1.4.1",
     "babel-eslint": "^10.0.1",
-    "eslint": "^5.8.0",
+    "eslint": "^5.10.0",
     "eslint-plugin-vue": "^5.0.0-0",
+    "mocha": "^5.2.0",
     "node-sass": "^4.9.0",
     "sass-loader": "^7.0.1",
+    "supertest": "^3.3.0",
     "vue-template-compiler": "^2.5.17"
   },
   "eslintConfig": {
     "root": true,
     "env": {
+      "es6": true,
       "node": true
     },
     "extends": [

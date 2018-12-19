@@ -3,12 +3,16 @@
         <form class="login__form" ref="login-form">
             <label class="login__label-email login__label">
                 E-mail
-                <input class="login__field-email login__field" type="email" name="email">
+                <input class="login__field-email login__field"
+                       v-model="form.email"
+                       type="email"
+                       name="email">
             </label>
             <label class="login__label-password login__label">
                 Пароль
                 <span class="login__wrapper-field">
                     <input class="login__field-password login__field"
+                           v-model="form.password"
                            :type="(!visiblePass)? 'password': 'text'"
                            name="password" >
                     <div class="login__wrapper-visible-icon" @click="visiblePass = !visiblePass">
@@ -29,30 +33,28 @@
 </template>
 
 <script>
-    import $ from 'jquery';
+    import axios from "axios"
+    import Cookies from 'js-cookie';
 
     export default {
         name: "Login",
         data () {
           return {
-              visiblePass: false
+              visiblePass: false,
+              form: {}
           }
         },
         methods: {
             loginForm () {
-                let formLogin = this.$refs['login-form'];
-                let formElems = formLogin.elements;
-
-                $.ajax({
-                    url: "/api/login",
-                    methods: "POST",
-                    body:{
-                        email: formElems.email.value,
-                        password: formElems.password.value
-                    },
-                    success (data) {
-                        console.log(data)
-                    }
+                axios.post('http://localhost:3000/api/login', this.form, {
+                    "Access-Control-Allow-Origin": "*"
+                })
+                .then((response) => {
+                    console.log(response.data);
+                    Cookies("outh_key", response.data.token)
+                })
+                .catch((e) => {
+                    console.log(e)
                 })
             }
         }
