@@ -9,13 +9,14 @@ module.exports = {
           surname VARCHAR(16),
           email VARCHAR(45) UNIQUE,
           password VARCHAR(60),
-          token VARCHAR(150) UNIQUE
+          token VARCHAR(150) UNIQUE,
+          refresh_token VARCHAR(50) UNIQUE
         )
     `,
-    setToken: function (email, token) {
+    setRefreshToken: function (email, token) {
         return `
             UPDATE user 
-            SET token='${token}'
+            SET refresh_token='${token}'
             WHERE email='${email}'
         `;
     },
@@ -26,13 +27,15 @@ module.exports = {
                 name, 
                 surname, 
                 email, 
-                password
+                password,
+                token
             ) VALUES (
                 false,
                 '${obj.name}', 
                 '${obj.surname}', 
                 '${obj.email}', 
-                '${obj.password}'
+                '${obj.password}',
+                '${obj.token}'
             )
         `;
     },

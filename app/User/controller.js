@@ -12,6 +12,23 @@ const Controller = function () {
         db.run(User.createTable);
     });
 
+    function uniqueToken (column, size, callback) {
+        let token = crypto.randomBytes(size).toString('hex');
+        let getValueTable =  User.getValueTable({
+            col: `${column}`,
+            where: `${column}='${token}'`,
+        });
+
+        db.all(getValueTable , (err, rows) => {
+            if(err) throw err;
+            if(rows.length === 0){
+                return callback(token);
+            }else{
+                uniqueToken();
+            }
+        });
+    }
+
     this.registration = function (req, res) {
         let body = req.body;
         let getValueTable = User.getValueTable({
@@ -27,20 +44,25 @@ const Controller = function () {
         db.all(getValueTable, function (err, row) {
             if(err) throw err;
             if(row.length === 0){
-                db.run(User.createRow(body), [], (err) => {
-                    if(err) {
-                        res.json({
-                            error: true,
-                            status: 500,
-                            massege: "Что то пошло не так"
-                        });
-                    }else{
-                        res.json({
-                            error: false,
-                            status: 200,
-                            massege: "Вы зарегистрировались"
-                        });
-                    }
+                uniqueToken("token", 148,(token) => {
+                    body.token =  token;
+
+                    db.run(User.createRow(body), [], (err) => {
+                        if(err) {
+                            res.json({
+                                error: true,
+                                status: 500,
+                                massege: "Что то пошло не так"
+                            });
+                        }else{
+                            res.json({
+                                error: false,
+                                status: 200,
+                                token: token,
+                                massege: "Вы зарегистрировались"
+                            });
+                        }
+                    });
                 });
             }else{
                 res.json({
@@ -52,26 +74,9 @@ const Controller = function () {
         });
     };
 
-    function uniqueToken (callback) {
-        let token = crypto.randomBytes(148).toString('hex');
-        let getValueTable =  User.getValueTable({
-            col: "token",
-            where: `token='${token}'`,
-        });
-
-        db.all(getValueTable , (err, rows) => {
-            if(err) throw err;
-            if(rows.length === 0){
-                return callback(token);
-            }else{
-                uniqueToken();
-            }
-        });
-    }
-
     this.login = function (req, res) {
         let getValueTable =  User.getValueTable({
-            col: "email, name, surname, password",
+            col: "email, name, surname, password, token",
             where: `email='${req.body.email}'`,
         });
 
@@ -93,12 +98,13 @@ const Controller = function () {
                     if (row[0].password === userPasswordHash) {
                         delete row[0].password;
 
-                        uniqueToken((token) => {
-                            db.run(User.setToken(row[0].email, token), {}, () => {
+                        uniqueToken("refresh_token", 48 ,(token) => {
+                            db.run(User.setRefreshToken(row[0].email, token), {}, () => {
                                 res.json({
                                     error: false,
                                     status: 200,
-                                    token: token,
+                                    token: row[0].token,
+                                    refreshToken: token,
                                     massege: "Вы успешно вошли"
                                 });
                             });
@@ -125,7 +131,7 @@ const Controller = function () {
 
     this.authentication = function(req, res) {
         let getColumns = User.getValueTable({
-            col: "name, surname, email, token",
+            col: "name, surname, email, token, refresh_token",
             where: `token='${req.params.token}'`,
         });
 
@@ -133,11 +139,14 @@ const Controller = function () {
             db.all(getColumns, [], (err, rows) => {
                 if (err) throw err;
 
-                if (rows.length !== 0) {
-                    delete rows[0].token;
+                if (rows.length !== 0
+                    && rows[0]["refresh_token"] === req.body.refreshToken)
+                {
+                    delete rows[0]["refresh_token"];
+                    delete rows[0]["token"];
                     res.json(rows[0]);
                 }else{
-                    res.json(400)
+                    res.json(400);
                 }
             });
         });
