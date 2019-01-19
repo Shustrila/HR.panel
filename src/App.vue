@@ -10,8 +10,8 @@
 </template>
 
 <script>
-import axios from "axios";
 import Cookies from 'js-cookie';
+import io from 'socket.io-client';
 
 export default {
     name: "App",
@@ -26,26 +26,21 @@ export default {
         UserList: () => import('./components/UserList'),
         PersonalAccount: () => import('./components/PersonalAccount')
     },
-    mounted () {
+    mounted(){
         let token = Cookies.get("outh_key");
+        let refreshToken = Cookies.get("refresh_key");
+        let sokets = io.connect("http://localhost:3000");
 
-        if(token !== undefined || token !== "") {
-            axios.get(`http://localhost:3000/api/user/${token}`, {}, {
-                "Access-Control-Allow-Origin": "*"
-            }).then(response => {
-                    console.log(response.data);
-                    this.$store.dispatch("login", response.data);
-            }).catch(error => {
-                console.log(error);
+        sokets.on("user verification online", function (data) {
+            console.log(data);
+            sokets.emit("user verification offline", {})
+        });
+
+        if(refreshToken && token){
+            this.$store.dispatch("login", {
+                token,
+                refreshToken
             });
-
-            // axios.get(`http://localhost:3000/api/users`, {}, {
-            //     "Access-Control-Allow-Origin": "*"
-            // }).then(response => {
-            //     this.$store.dispatch("usersOnline", response.data);
-            // }).catch(error => {
-            //     console.log(error);
-            // });
         }
     }
 }

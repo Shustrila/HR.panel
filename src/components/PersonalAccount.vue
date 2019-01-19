@@ -30,7 +30,11 @@
                 </button>
                 <button class="personal-account__close personal-account__footer-button"
                         @click.prevent="closePersonalAccount()">
-                    Выйти
+                    Закрыть
+                </button>
+                <button class="personal-account__close personal-account__footer-button"
+                        @click.prevent="exitAccount()">
+                    Выйти из акаунта
                 </button>
             </div>
         </div>
@@ -38,16 +42,33 @@
 </template>
 
 <script>
+    import Cookies from 'js-cookie';
+    import io from 'socket.io-client';
+
     export default {
         name: "PersonalAccount",
-        data () {
-            return {
-                login: this.$store.state.userLogin
+        computed: {
+            login () {
+                return this.$store.getters.getUserLogin
             }
         },
         methods: {
             closePersonalAccount () {
-                this.$store.commit("personalAccount", this.login = !this.login)
+                this.$store.commit("personalAccount", false)
+            },
+            exitAccount () {
+                let sokets = io.connect("http://localhost:3000");
+
+                this.$store.commit("loginUser", null);
+                this.$store.commit("setUsersOnline", []);
+                this.$store.commit("setWorkers", []);
+
+                sokets.emit("User exit", { token: Cookies.get("outh_key") });
+
+                this.closePersonalAccount();
+
+                Cookies.remove("outh_key");
+                Cookies.remove("refresh_key");
             }
         }
     }

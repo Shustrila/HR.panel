@@ -92,10 +92,7 @@
                 if (email === undefined || email === "") {
                     this.errorsForm.push({
                         name: "email",
-                        massege: `
-                            Поле E-mail нужно для того что бы
-                            войти в акант и для уведомлений на почту
-                        `
+                        massege: "Поле E-mail нужно для того что бы войти в акант"
                     })
                 }else{
                     let regExp = new RegExp(".*[@][a-z]+[.][a-z]+");
@@ -146,8 +143,9 @@
                 }
 
                 if (this.form.password === this.form.repeatPassword
-                    && this.errorsForm.length === 0) {
-                        axios.post('http://localhost:3000/api/registration' , this.form, {
+                    && this.errorsForm.length === 0)
+                {
+                        axios.post('http://localhost:3000/api/v1/user/registration' , this.form, {
                             "Access-Control-Allow-Origin": "*"
                         })
                         .then((response) => {
@@ -184,6 +182,8 @@
                     formRegElem.parentElement.appendChild(div);
                 }
             }
+        },
+        mounted(){
         }
     }
 </script>

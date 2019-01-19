@@ -1,6 +1,9 @@
 <template>
     <div class="login">
         <form class="login__form" ref="login-form">
+            <div class="login__error-message" v-if="errorForm.state">
+                <p>{{ errorForm.massege }}</p>
+            </div>
             <label class="login__label-email login__label">
                 E-mail
                 <input class="login__field-email login__field"
@@ -27,7 +30,8 @@
             </label>
             <input class="login__submit"
                    type="submit"
-                   @click.prevent="loginForm()">
+                   @click.prevent="loginForm"
+                   value="Вход">
         </form>
     </div>
 </template>
@@ -41,23 +45,38 @@
         data () {
           return {
               visiblePass: false,
-              form: {}
+              form: {},
+              errorForm: {
+                  state: false,
+                  massege: null
+              }
           }
         },
         methods: {
             loginForm () {
-                axios.post('http://localhost:3000/api/login', this.form, {
+                axios.post('http://localhost:3000/api/v1/user/login', this.form, {
                     "Access-Control-Allow-Origin": "*"
-                })
-                .then((response) => {
-                    console.log(response.data);
-                    Cookies("outh_key", response.data.token)
-                })
-                .catch((e) => {
-                    console.log(e)
-                })
+                }).then((response) => {
+                    let data = response.data;
+
+                    if(data.token !== undefined && data.refreshToken !== undefined) {
+                        Cookies("outh_key", data.token);
+                        Cookies("refresh_key",data.refreshToken);
+
+                        this.$store.dispatch("login", {
+                            token: Cookies.get("outh_key"),
+                            refreshToken: Cookies.get("refresh_key")
+                        });
+
+                        this.$router.push({
+                            name: "home"
+                        });
+                    }
+                });
+
             }
         }
+
     }
 </script>
 

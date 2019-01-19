@@ -1,52 +1,40 @@
-<template>
+<template lang="html">
     <div class="user-list user-list--hidden js-user-list">
-        <div class="user-list__label">Пользователей онлайн {{ numberOfUsers }}</div>
-        <ul class="user-list__list" v-if="login">
-            <li class="user-list__item" v-for="user in usersList" :key="user">
+        <div class="user-list__label">Пользователей онлайн: {{ users.length }}</div>
+        <input type="search" name="" v-model="users.email" v-if="!users">
+        <ul class="user-list__list" v-if="users">
+            <li class="user-list__item" v-for="user in users" :key="user.id">
                 <div class="user-list__img">
 
                 </div>
                 <div class="user-list__wpapper">
                     <div class="user-list__name">
-                        {{ user.name }}
+                        {{user.name}}
                     </div>
                     <div class="user-list__email">
-                        {{ user.email }}
+                        {{user.email}}
                     </div>
                 </div>
             </li>
         </ul>
-        <div class="user-list__info" v-if="!login">
-            Что бы видеть активных<br>
-            пользовотелей нужно<br>
-            <router-link to="/registration"> зарегистрироваться </router-link>
-        </div>
-        <div class="user-list__info" v-if="login && usersList.length  === 0">
-            Нет пользователей онлайн
+        <div class="user-list__info" v-if="users.length == 0">
+            Нет пользователей <br>
+            Онлайн
         </div>
     </div>
 </template>
-s
-<script>
+
+<script lang="js">
     export default {
         name: "UserList",
-        data () {
-            return {
-                login: {},
-                usersList: {}
+        computed: {
+            users () {
+                return this.$store.getters.getUsersOnline
             }
         },
-        computed: {
-            numberOfUsers(){
-                let usersList = this.usersList;
-
-                if( this.usersList !== null ){
-                    return usersList.length
-                }else{
-                    return 0
-                }
-            }
-        }
+        mounted () {
+            this.$store.dispatch("usersOnline");
+        },
     }
 </script>
 
@@ -102,6 +90,12 @@ s
         }
         &__info{
             color: #ffffff;
+            font-size: 20px;
+
+            &-link{
+                display: block;
+                color: #ddd;
+            }
         }
     }
 </style>

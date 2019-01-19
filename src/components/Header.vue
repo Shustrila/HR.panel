@@ -15,7 +15,7 @@
                 </li>
             </ul>
         </div>
-        <div class="header__auth"  v-if="!login">
+        <div class="header__auth"  v-if="!userLogin">
             <router-link class="header__auth-login header__auth-link" to="/login">
                 Вход
             </router-link>
@@ -24,10 +24,10 @@
                 Регистрация
             </router-link>
         </div>
-        <div class="header__user" v-if="login"  @click.prevent="personalAccountActive()">
+        <div class="header__user" v-if="userLogin"  @click.prevent="personalAccountActive()">
             <div class="header__user-img"></div>
             <a class="header__user-name">
-                {{ `${login.name} ${login.surname}` }}
+                {{ `${userLogin.name} ${userLogin.surname}` }}
             </a>
         </div>
         <div class="header__user-list" @click="activeMenu()">
@@ -37,21 +37,18 @@
 </template>
 
 <script>
-    import $ from 'jquery'
-    import axios from "axios";
-    import Cookies from 'js-cookie';
-
     export default {
         name: "Header",
-        data() {
-            return {
-                login: this.$store.state.userLogin,
-                workers: this.$store.state.workers
+        computed: {
+            userLogin () {
+                return this.$store.getters.getUserLogin
             }
         },
         methods: {
             activeMenu(){
-                $('.js-user-list').toggleClass('user-list--hidden')
+                let userList = document.querySelector('.js-user-list');
+
+                userList.classList.toggle('user-list--hidden');
             },
             personalAccountActive(){
                 this.$store.commit("personalAccount", true)
