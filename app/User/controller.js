@@ -1,6 +1,11 @@
 const crypto                  = require("crypto");
-const { SQLITE, SECRET_KEY, } = require("../config.json");
+const { SQLITE, SECRET_KEY } = require("../config.json");
 const sqlite3                 = require("sqlite3").verbose();
+
+const express        = require("express");
+const app            = express();
+const http           = require("http").Server(app);
+const io             = require("socket.io")(http);
 
 let User  = require("./model");
 
@@ -13,10 +18,10 @@ const Controller = function () {
     });
 
     function uniqueToken (column, size, callback) {
-        let token = crypto.randomBytes(size).toString('hex');
+        let token = crypto.randomBytes(size).toString("hex");
         let getValueTable =  User.getValueTable({
             col: `${column}`,
-            where: `${column}='${token}'`,
+            where: `${column}='${token}'`
         });
 
         db.all(getValueTable , (err, rows) => {
@@ -33,7 +38,7 @@ const Controller = function () {
         let body = req.body;
         let getValueTable = User.getValueTable({
             col: "email",
-            where: `email='${body.email}'`,
+            where: `email='${body.email}'`
         });
 
         body.password = crypto
@@ -77,18 +82,21 @@ const Controller = function () {
     this.login = function (req, res) {
         let getValueTable =  User.getValueTable({
             col: "email, name, surname, password, token",
-            where: `email='${req.body.email}'`,
+            where: `email='${req.body.email}'`
         });
 
         db.all(getValueTable, function (err, row) {
             if (err) {
+
                 console.log(err);
                 res.json({
                     error: true,
                     status: 500,
                     massege: "Проблемы с сервером"
                 });
+
             } else {
+
                 if (row.length !== 0) {
                     let userPasswordHash = crypto
                         .createHash("sha256", SECRET_KEY)
@@ -125,6 +133,7 @@ const Controller = function () {
                         massege: "Веден не верный email"
                     });
                 }
+
             }
         });
     };
@@ -132,7 +141,7 @@ const Controller = function () {
     this.authentication = function(req, res) {
         let getColumns = User.getValueTable({
             col: "name, surname, email, token, refresh_token",
-            where: `token='${req.params.token}'`,
+            where: `token="${req.params.token}"`
         });
 
         db.serialize(function () {
@@ -140,7 +149,7 @@ const Controller = function () {
                 if (err) throw err;
 
                 if (rows.length !== 0
-                    && rows[0]["refresh_token"] === req.body.refreshToken)
+                    && rows[0]["refresh_token"] === req.params.refreshToken)
                 {
                     delete rows[0]["refresh_token"];
                     delete rows[0]["token"];
@@ -152,14 +161,43 @@ const Controller = function () {
         });
     };
 
+    this.stateOnlineUser = function (socket) {
+        let token = null;
+        let getAllOnline = Controller.getAllOnline;
+
+        db.serialize(function () {
+            socket.on("online", function (data) {
+                token = data.token;
+
+                db.run(User.updateOnline(token, true));
+
+            });
+
+            socket.emit("user verification online", getAllOnline);
+
+            socket.on("user verification offline", function(data){
+                console.log(getAllOnline);
+            });
+
+            socket.on("disconnect", function () {
+                db.run(User.updateOnline(token, false));
+            });
+
+            socket.on("User exit", function (data) {
+                db.run(User.updateOnline(data.token, false));
+            });
+        });
+
+    };
+
     this.getAllOnline = function (req, res) {
-        let getColumns = User.getColumns("name, email, online, surname");
+        let getColumns = User.getColumns("id, name, email, online, surname");
 
         db.serialize(function () {
             db.all(getColumns, [], (err, rows) => {
                 if(err) throw err;
 
-                res.json(rows.filter(row => row["online"] === 1));
+                res.json(rows.filter(row => row["online"] === "true"));
             });
         });
     };

@@ -25,11 +25,13 @@ Body
 
 Meta
 
+
 | Название| Тип | Описание | 
 | :---: | :---: | :--- |
 | error | Boolean | Состояние ошибки | 
 | status | Number | Статус ответа | 
-| massege | String | Описание ответа | 
+| token | String | Токен который пойдет в cookies |
+| message | String | Описание ответа | 
 
 ##
 
@@ -53,8 +55,9 @@ Meta
 | error | Boolean | Состояние ошибки | 
 | status | Number | Статус ответа | 
 | nameField | String | Поле ошибки | 
-| token | String | токен для входа |
-| massege | String | Описание ответа | 
+| token | String | токен для авто авторизации |
+| refreshToken | String | токен для проверки пользовотеля |
+| message | String | Описание ответа | 
 ##
 
 ``
@@ -69,7 +72,14 @@ Param
 | :---: | :---: | :--- |
 | Token | String | токен предоваемый в URI как :token |
 
-Respons 
+Body
+
+| Название| Тип | Описание | 
+| :---: | :---: | :--- |
+| refreshToken | String | refresh token из cookies |
+
+
+Response 
 
 | Название| Тип | Описание | 
 | :---: | :---: | :--- |

@@ -29,20 +29,12 @@ app.use(cookiParser());
 //     },
 // }));
 
-app.use("/api", require("./app/routes.js"));
+app.use("/api", require("./app/routes.js").app);
 app.use(express.static("dist"));
 app.get("/", (req, res) => res.sendFile(`${__dirname}/dist/index.html`));
-
-io.on("connection", function(socket){
-
-    console.log("a user connected");
-
-    socket.on("disconnect", function(){
-        console.log("user disconnected");
-    });
-
-});
 
 http.listen((env.PORT || 3000), function () {
     console.log(`http://localhost:${env.PORT}`);
 });
+
+io.on("connection", require("./app/User/controller").stateOnlineUser);

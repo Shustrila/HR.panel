@@ -13,30 +13,31 @@ module.exports = {
           refresh_token VARCHAR(50) UNIQUE
         )
     `,
-    setRefreshToken: function (email, token) {
-        return `
-            UPDATE user 
-            SET refresh_token='${token}'
-            WHERE email='${email}'
-        `;
-    },
-    createRow: function (obj) {
-        return `
-            INSERT INTO user (
-                online,
-                name, 
-                surname, 
-                email, 
-                password,
-                token
-            ) VALUES (
-                false,
-                '${obj.name}', 
-                '${obj.surname}', 
-                '${obj.email}', 
-                '${obj.password}',
-                '${obj.token}'
-            )
-        `;
-    },
+    setRefreshToken: (email, token) => `
+        UPDATE user 
+        SET refresh_token='${token}'
+        WHERE email='${email}'
+    `,
+    createRow: (obj) => `
+        INSERT INTO user (
+            online,
+            name, 
+            surname, 
+            email, 
+            password,
+            token
+        ) VALUES (
+            false,
+            '${obj.name}', 
+            '${obj.surname}', 
+            '${obj.email}', 
+            '${obj.password}',
+            '${obj.token}'
+        )
+    `,
+    updateOnline: (where, val) => `
+        UPDATE user  
+        SET online="${ val }"
+        WHERE token="${ where }"
+    `
 };
