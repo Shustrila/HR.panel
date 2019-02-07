@@ -60,7 +60,10 @@ let Ontroller = function () {
             db.run(Worker.update(req.body), req.params.id, function (err, row) {
                 if(err) throw err;
 
-                res.json(row);
+                res.json({
+                    status: 200,
+                    massege: "Работник изменен"
+                });
             });
         });
 

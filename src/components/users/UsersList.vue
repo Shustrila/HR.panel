@@ -1,9 +1,9 @@
 <template lang="html">
     <div class="user-list user-list--hidden js-user-list">
         <div class="user-list__label">Пользователей онлайн: {{ users.length }}</div>
-        <input type="search" name="" v-model="users.email" v-if="!users">
+        <input type="search" name="" v-model="searchUsers" v-if="users.length > 0">
         <ul class="user-list__list" v-if="users">
-            <li class="user-list__item" v-for="user in users" :key="user.id">
+            <li class="user-list__item" v-for="user in filterUsers" :key="user.id">
                 <div class="user-list__img">
 
                 </div>
@@ -17,7 +17,7 @@
                 </div>
             </li>
         </ul>
-        <div class="user-list__info" v-if="users.length == 0">
+        <div class="user-list__info" v-if="users.length === 0">
             Нет пользователей <br>
             Онлайн
         </div>
@@ -25,16 +25,42 @@
 </template>
 
 <script lang="js">
+    import Cookies from 'js-cookie';
+    import axios from "axios";
+    import io from "socket.io-client";
+
     export default {
         name: "UserList",
-        computed: {
-            users () {
-                return this.$store.getters.getUsersOnline
+        data () {
+            return{
+                searchUsers : ""
             }
         },
-        mounted () {
-            this.$store.dispatch("usersOnline");
+        computed: {
+            users () {
+                return this.$store.getters.users;
+            },
+            filterUsers () {
+                let search = this.searchUsers;
+                let users = this.users;
+                let arr = [];
+
+                if (search !== "") {
+                    for (let user of users) {
+                        let regexp = new RegExp("^(" + search + ")+", "i");
+
+                        if (regexp.test(user.name)) {
+                            arr.push(user);
+                        }
+                    }
+
+                    return arr;
+                }
+
+                return this.users;
+            }
         },
+        mounted () {},
     }
 </script>
 

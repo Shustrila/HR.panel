@@ -1,0 +1,10 @@
+{
+  "source": {
+    "include": ["app"]
+  },
+  "opts": {
+    "encoding": "utf8",
+    "destination": "docs",
+    "recurse": true
+  }
+}
