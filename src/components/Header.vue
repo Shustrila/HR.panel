@@ -8,14 +8,14 @@
                         Главная
                     </router-link>
                 </li>
-                <li class="header__menu-item">
+                <li class="header__menu-item" v-if="userLogin !== null">
                     <router-link class="header__menu-link" to="/panel">
                         Панель
                     </router-link>
                 </li>
             </ul>
         </div>
-        <div class="header__auth"  v-if="!userLogin">
+        <div class="header__auth"  v-if="Object.keys(userLogin).length === 0">
             <router-link class="header__auth-login header__auth-link" to="/login">
                 Вход
             </router-link>
@@ -24,10 +24,10 @@
                 Регистрация
             </router-link>
         </div>
-        <div class="header__user" v-if="userLogin"  @click.prevent="personalAccountActive()">
+        <div class="header__user" v-if="Object.keys(userLogin).length !== 0"  @click.prevent="personalAccountActive()">
             <div class="header__user-img"></div>
             <a class="header__user-name">
-                {{ `${userLogin.name} ${userLogin.surname}` }}
+                {{userLogin.name+" "+userLogin.surname}}
             </a>
         </div>
         <div class="header__user-list" @click="activeMenu()">
@@ -37,24 +37,39 @@
 </template>
 
 <script>
-    export default {
-        name: "Header",
-        computed: {
-            userLogin () {
-                return this.$store.getters.getUserLogin
-            }
-        },
-        methods: {
-            activeMenu(){
-                let userList = document.querySelector('.js-user-list');
+    import { mapActions, mapGetters } from "vuex"
+    import Cookies from 'js-cookie';
 
-                userList.classList.toggle('user-list--hidden');
-            },
-            personalAccountActive(){
-                this.$store.commit("personalAccount", true)
-            }
+export default {
+    name: "Header",
+    computed: {
+        ...mapGetters({
+            userLogin: "auth/userLogin"
+        })
+    },
+    methods: {
+        ...mapActions({
+            user : "auth/user"
+        }),
+        activeMenu(){
+            document.querySelector('.js-user-list')
+                    .classList
+                    .toggle('user-list--hidden');
+        },
+        personalAccountActive(){
+            this.$store.commit("setPersonalAccount", true)
         }
+    },
+    mounted(){
+        let token = Cookies.get("auth_key");
+        let refreshToken = Cookies.get("refresh_key");
+
+        if (refreshToken && token) {
+            this.user();
+        }
+
     }
+}
 </script>
 
 <style lang="scss">

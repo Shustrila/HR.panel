@@ -8,20 +8,20 @@
                 <div class="personal-account__b-card">
                     <div class="personal-account__b-card-img"></div>
                     <div class="personal-account__b-card-name">
-                        {{`${login.name} ${login.surname}`}}
+                        {{`${userLogin.name} ${userLogin.surname}`}}
                     </div>
                 </div>
                 <label class="personal-account__b-label">
                     Имя
-                    <input type="text" name="name" :placeholder="login.name">
+                    <input type="text" name="name" :placeholder="userLogin.name">
                 </label>
                 <label class="personal-account__b-label">
                     Фамилия
-                    <input type="text" name="surname" :placeholder="login.surname">
+                    <input type="text" name="surname" :placeholder="userLogin.surname">
                 </label>
                 <label class="personal-account__b-label">
                     E-mail
-                    <input type="email" name="email" :placeholder="login.email">
+                    <input type="email" name="email" :placeholder="userLogin.email">
                 </label>
             </div>
             <div class="personal-account__footer">
@@ -42,34 +42,40 @@
 </template>
 
 <script>
+    import { mapActions, mapMutations, mapGetters } from "vuex"
+
     import Cookies from 'js-cookie';
     import io from 'socket.io-client';
 
     export default {
         name: "PersonalAccount",
         computed: {
-            login () {
-                return this.$store.getters.getUserLogin
-            }
+            ...mapGetters({
+                userLogin: "auth/userLogin"
+            })
         },
         methods: {
             closePersonalAccount () {
-                this.$store.commit("personalAccount", false)
+                this.$store.commit("setPersonalAccount", false)
             },
             exitAccount () {
-                let sokets = io.connect("http://localhost:3000");
-
-                this.$store.commit("loginUser", null);
-                this.$store.commit("setUsersOnline", []);
-                this.$store.commit("setWorkers", []);
-
-                sokets.emit("User exit", { token: Cookies.get("outh_key") });
+                this.setUserOnlone({});
+                this.$store.commit("setUsers", []);
 
                 this.closePersonalAccount();
 
-                Cookies.remove("outh_key");
+                Cookies.remove("auth_key");
                 Cookies.remove("refresh_key");
-            }
+            },
+            ...mapActions({
+                user : "auth/user"
+            }),
+            ...mapMutations({
+                setUserOnlone: "auth/setUserOnlone"
+            })
+        },
+        mounted() {
+            console.log(this.$store)
         }
     }
 </script>

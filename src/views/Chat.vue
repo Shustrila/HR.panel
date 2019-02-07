@@ -1,13 +1,15 @@
-<template>
+<template lang="html">
+		<div class="">
 
+		</div>
 </template>
 
-<script>
+<script lang="js">
     export default {
         name: "Chat"
     }
 </script>
 
-<style scoped>
+<style lang="scss">
 
 </style>

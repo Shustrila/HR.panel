@@ -1,19 +1,27 @@
 <template>
     <div class="login">
-        <form class="login__form" ref="login-form">
-            <div class="login__error-message" v-if="errorForm.state">
-                <p>{{ errorForm.massege }}</p>
-            </div>
+        <form class="login__form"
+              id="login"
+              action="http://localhost:3000/api/v1/user/login"
+              @submit.prevent="loginForm">
             <label class="login__label-email login__label">
                 E-mail
-                <input class="login__field-email login__field"
-                       v-model="form.email"
-                       type="email"
-                       name="email">
+                <span class="login__wrapper-field">
+                    <div class="login__error" v-if="validation.login.email">
+											{{ validation.login.email }}
+										</div>
+                    <input class="login__field-email login__field"
+                           v-model="form.email"
+                           type="email"
+                           name="email">
+                </span>
             </label>
             <label class="login__label-password login__label">
                 Пароль
                 <span class="login__wrapper-field">
+                    <div class="login__error" v-if="validation.login.password">
+												{{ validation.login.password }}
+										</div>
                     <input class="login__field-password login__field"
                            v-model="form.password"
                            :type="(!visiblePass)? 'password': 'text'"
@@ -28,16 +36,13 @@
                     </div>
                 </span>
             </label>
-            <input class="login__submit"
-                   type="submit"
-                   @click.prevent="loginForm"
-                   value="Вход">
+            <input class="login__submit" type="submit" value="Вход">
         </form>
     </div>
 </template>
 
 <script>
-    import axios from "axios"
+    import { mapActions, mapGetters, mapMutations } from "vuex";
     import Cookies from 'js-cookie';
 
     export default {
@@ -46,37 +51,40 @@
           return {
               visiblePass: false,
               form: {},
-              errorForm: {
-                  state: false,
-                  massege: null
-              }
           }
         },
+        computed: {
+            ...mapGetters({
+              validation: "auth/valiationErrors"
+            })
+        },
         methods: {
+            ...mapActions({
+                login: "auth/login",
+                user: "auth/user"
+            }),
+            ...mapMutations({
+                errorValiationForm: "auth/errorValiationForm"
+            }),
             loginForm () {
-                axios.post('http://localhost:3000/api/v1/user/login', this.form, {
-                    "Access-Control-Allow-Origin": "*"
-                }).then((response) => {
-                    let data = response.data;
+                this.login(this.form)
+                    .then((res) => {
+                        if (res.data.status === 200) {
+                            Cookies.set("auth_key", res.data.token);
+                            Cookies.set("refresh_key", res.data.refreshToken);
 
-                    if(data.token !== undefined && data.refreshToken !== undefined) {
-                        Cookies("outh_key", data.token);
-                        Cookies("refresh_key",data.refreshToken);
-
-                        this.$store.dispatch("login", {
-                            token: Cookies.get("outh_key"),
-                            refreshToken: Cookies.get("refresh_key")
-                        });
-
-                        this.$router.push({
-                            name: "home"
-                        });
-                    }
-                });
-
+                            this.user();
+                            this.$store.dispatch("getUsers");
+                            this.$router.push("/")
+                        } else {
+                            this.errorValiationForm({
+                                type: "login",
+                                data: res.data.errors
+                            });
+                        }
+                    });
             }
         }
-
     }
 </script>
 
@@ -84,6 +92,7 @@
     .login{
         display: flex;
         align-items: center;
+        flex-direction: column;
         justify-content: center;
         position: absolute;
         top: 0;
@@ -120,20 +129,65 @@
         }
 
         &__wrapper-field{
+            display: block;
             position: relative;
+        }
+
+        &__error{
+            position: absolute;
+            top: 50%;
+            left: 0;
+            padding: 5px 25px;
+            border-radius: 5px;
+            background-color: red;
+            transform: translate(-107%, -50%);
+        }
+        &__error:after{
+            content: "";
+            position: inherit;
+            top: 50%;
+            right: 1px;
+            width: 0;
+            height: 0;
+            border-top: 7px solid transparent;
+            border-left: 10px solid red;
+            border-bottom: 7px solid transparent;
+            transform: translate(100%, -50%);
+        }
+        &__error-massege{
+            display: inline-flex;
+            align-items: center;
+            position: relative;
+            text-align: center;
+            padding: 10px 20px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: red;
+            color: #fff;
+        }
+        &__error-massege:after{
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-top: 7px solid transparent;
+            border-left: 10px solid red;
+            border-bottom: 7px solid transparent;
+            transform: translate(100%, -50%);
         }
 
         &__wrapper-visible-icon{
             display: flex;
             align-items: center;
             position: absolute;
-            top: 11.5px;
+            top: 0;
             right: 0;
             height: (16px + 20);
             padding: 0 10px;
             color: #000000;
             border: 0;
-            transform: translateY(-50%);
             z-index: 2;
             cursor: pointer;
         }

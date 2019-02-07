@@ -1,47 +1,27 @@
 <template>
     <div id="app">
-        <app-header/>
-        <div class="content">
+
+        <app-header v-cloak/>
+        <div class="content js-content">
             <router-view/>
-            <user-list/>
-            <personal-account v-if="$store.state.personalAccount"/>
+            <users-list/>
+            <personal-account v-if="$store.getters.personalAccount"/>
         </div>
     </div>
 </template>
 
 <script>
-import Cookies from 'js-cookie';
-import io from 'socket.io-client';
-
 export default {
     name: "App",
     data () {
         return {
-            errored: false,
-            workers: [],
+
         }
     },
     components: {
         appHeader: () => import('./components/Header'),
-        UserList: () => import('./components/UserList'),
+        UsersList: () => import('./components/users/UsersList'),
         PersonalAccount: () => import('./components/PersonalAccount')
-    },
-    mounted(){
-        let token = Cookies.get("outh_key");
-        let refreshToken = Cookies.get("refresh_key");
-        let sokets = io.connect("http://localhost:3000");
-
-        sokets.on("user verification online", function (data) {
-            console.log(data);
-            sokets.emit("user verification offline", {})
-        });
-
-        if(refreshToken && token){
-            this.$store.dispatch("login", {
-                token,
-                refreshToken
-            });
-        }
     }
 }
 </script>
@@ -51,6 +31,10 @@ export default {
   padding: 0;
   margin: 0;
   box-sizing: border-box;
+}
+
+[v-cloak]{
+    display: none;
 }
 
 html, body{
@@ -69,14 +53,14 @@ html, body{
 }
 
 #app {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    font-family: 'Avenir', Helvetica, Arial, sans-serif;
+    text-align: center;
+    color: #2c3e50;
 }
 .content{
   flex-grow: 1;
